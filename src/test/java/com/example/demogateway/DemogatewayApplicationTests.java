@@ -1,6 +1,6 @@
 package com.example.demogateway;
 
-import org.assertj.core.api.Assertions;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -21,18 +21,70 @@ public class DemogatewayApplicationTests {
 
 	@LocalServerPort
 	int port;
+	private WebTestClient client;
 
+	@Before
+	public void setup() {
+		client = WebTestClient.bindToServer().baseUrl("http://localhost:" + port).build();
+	}
 
 	@Test
-	public void contextLoads() {
-		WebTestClient client = WebTestClient.bindToServer().baseUrl("http://localhost:" + port)
+	@SuppressWarnings("unchecked")
+	public void pathRouteWorks() {
+		client.get().uri("/get")
+				.exchange()
+				.expectStatus().isOk()
+				.expectBody(Map.class)
+				.consumeWith(result -> {
+					assertThat(result.getResponseBody()).isNotEmpty();
+				});
+	}
+
+	@Test
+	@SuppressWarnings("unchecked")
+	public void hostRouteWorks() {
+		client.get().uri("/headers")
+				.header("Host", "www.myhost.org")
+				.exchange()
+				.expectStatus().isOk()
+				.expectBody(Map.class)
+				.consumeWith(result -> {
+					assertThat(result.getResponseBody()).isNotEmpty();
+				});
+	}
+
+	@Test
+	@SuppressWarnings("unchecked")
+	public void rewriteRouteWorks() {
+		client.get().uri("/foo/get")
+				.header("Host", "www.rewrite.org")
+				.exchange()
+				.expectStatus().isOk()
+				.expectBody(Map.class)
+				.consumeWith(result -> {
+					assertThat(result.getResponseBody()).isNotEmpty();
+				});
+	}
+
+	@Test
+	@SuppressWarnings("unchecked")
+	public void hystrixRouteWorks() {
+		client.get().uri("/delay/3")
+				.header("Host", "www.hystrix.org")
+				.exchange()
+				.expectStatus().isEqualTo(HttpStatus.GATEWAY_TIMEOUT);
+	}
+
+	@Test
+	public void rateLimiterWorks() {
+		WebTestClient authClient = client.mutate()
 				.filter(basicAuthentication("user", "password"))
 				.build();
 
 		boolean wasLimited = false;
 
 		for (int i = 0; i < 20; i++) {
-			FluxExchangeResult<Map> result = client.get()
+			FluxExchangeResult<Map> result = authClient.get()
 					.uri("/anything/1")
 					.header("Host", "www.limited.org")
 					.exchange()
