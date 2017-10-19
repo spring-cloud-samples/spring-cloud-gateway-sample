@@ -11,12 +11,9 @@ import org.springframework.security.core.userdetails.MapUserDetailsRepository;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.server.SecurityWebFilterChain;
-import org.springframework.tuple.TupleBuilder;
 
 import static org.springframework.cloud.gateway.filter.factory.GatewayFilters.hystrix;
 import static org.springframework.cloud.gateway.filter.factory.GatewayFilters.rewritePath;
-import static org.springframework.cloud.gateway.filter.factory.RequestRateLimiterGatewayFilterFactory.BURST_CAPACITY_KEY;
-import static org.springframework.cloud.gateway.filter.factory.RequestRateLimiterGatewayFilterFactory.REPLENISH_RATE_KEY;
 import static org.springframework.cloud.gateway.handler.predicate.RoutePredicates.host;
 import static org.springframework.cloud.gateway.handler.predicate.RoutePredicates.path;
 
@@ -36,13 +33,13 @@ public class DemogatewayApplication {
 					.predicate(host("*.rewrite.org"))
 					.filter(rewritePath("/foo/(?<segment>.*)", "/${segment}"))
 					.uri("http://httpbin.org:80")
-				.route("rewrite_route")
+				.route("hystrix_route")
 					.predicate(host("*.hystrix.org"))
 					.filter(hystrix("slowcmd"))
 					.uri("http://httpbin.org:80")
 				.route("limit_route")
 					.predicate(host("*.limited.org").and(path("/anything/**")))
-					.filter(rateLimiter.apply(TupleBuilder.tuple().of(REPLENISH_RATE_KEY, "1", BURST_CAPACITY_KEY, "2")))
+					.filter(rateLimiter.apply(1, 2))
 					.uri("http://httpbin.org:80")
 				.route("websocket_route")
 					.predicate(path("/echo"))
