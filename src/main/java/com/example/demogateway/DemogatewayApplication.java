@@ -17,23 +17,27 @@ public class DemogatewayApplication {
 
 	@Bean
 	public RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
+		//@formatter:off
 		return builder.routes()
-				.route(r -> r.path("/get")
+				.route("path_route", r -> r.path("/get")
+						.uri("http://httpbin.org:80"))
+				.route("host_route", r -> r.host("*.myhost.org")
+						.uri("http://httpbin.org:80"))
+				.route("rewrite_route", r -> r.host("*.rewrite.org")
+						.filters(f -> f.rewritePath("/foo/(?<segment>.*)",
+								"/${segment}"))
+						.uri("http://httpbin.org:80"))
+				.route("hystrix_route", r -> r.host("*.hystrix.org")
+						.filters(f -> f.hystrix("slowcmd"))
+								.uri("http://httpbin.org:80"))
+				.route("limit_route", r -> r
+					.host("*.limited.org").and().path("/anything/**")
+						.filters(f -> f.requestRateLimiter(RedisRateLimiter.args(1, 2)))
 					.uri("http://httpbin.org:80"))
-				.route(r -> r.host("*.myhost.org")
-					.uri("http://httpbin.org:80"))
-				.route(r -> r.host("*.rewrite.org")
-					.rewritePath("/foo/(?<segment>.*)", "/${segment}")
-					.uri("http://httpbin.org:80"))
-				.route(r -> r.host("*.hystrix.org")
-					.hystrix("slowcmd")
-					.uri("http://httpbin.org:80"))
-				.route(r -> r.host("*.limited.org").and().path("/anything/**")
-					.requestRateLimiter(RedisRateLimiter.args(1, 2))
-					.uri("http://httpbin.org:80"))
-				.route(r -> r.path("/echo")
+				.route("websocket_route", r -> r.path("/echo")
 					.uri("ws://localhost:9000"))
 				.build();
+		//@formatter:on
 	}
 
 	@Bean
@@ -47,8 +51,8 @@ public class DemogatewayApplication {
 	}
 
 	@Bean
-	public MapReactiveUserDetailsService mapReactiveUserDetailsService() {
-		UserDetails user = User.withUsername("user").password("{noop}password").roles("USER").build();
+	public MapReactiveUserDetailsService reactiveUserDetailsService() {
+		UserDetails user = User.withDefaultPasswordEncoder().username("user").password("password").roles("USER").build();
 		return new MapReactiveUserDetailsService(user);
 	}
 
