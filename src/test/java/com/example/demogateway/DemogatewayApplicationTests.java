@@ -76,6 +76,16 @@ public class DemogatewayApplicationTests {
 	}
 
 	@Test
+	@SuppressWarnings("unchecked")
+	public void hystrixFallbackRouteWorks() {
+		client.get().uri("/delay/3")
+				.header("Host", "www.hystrixfallback.org")
+				.exchange()
+				.expectStatus().isOk()
+				.expectBody(String.class).isEqualTo("This is a fallback");
+	}
+
+	@Test
 	public void rateLimiterWorks() {
 		WebTestClient authClient = client.mutate()
 				.filter(basicAuthentication("user", "password"))

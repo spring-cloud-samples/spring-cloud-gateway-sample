@@ -11,9 +11,19 @@ import org.springframework.security.core.userdetails.MapReactiveUserDetailsServi
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.server.SecurityWebFilterChain;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
+import java.net.URI;
+
+@RestController
 @SpringBootApplication
 public class DemogatewayApplication {
+
+	@RequestMapping("/hystrixfallback")
+	public String hystrixfallback() {
+		return "This is a fallback";
+	}
 
 	@Bean
 	public RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
@@ -29,6 +39,9 @@ public class DemogatewayApplication {
 						.uri("http://httpbin.org:80"))
 				.route("hystrix_route", r -> r.host("*.hystrix.org")
 						.filters(f -> f.hystrix("slowcmd"))
+								.uri("http://httpbin.org:80"))
+				.route("hystrix_fallback_route", r -> r.host("*.hystrixfallback.org")
+						.filters(f -> f.hystrix("slowcmd", URI.create("forward:/hystrixfallback")))
 								.uri("http://httpbin.org:80"))
 				.route("limit_route", r -> r
 					.host("*.limited.org").and().path("/anything/**")
