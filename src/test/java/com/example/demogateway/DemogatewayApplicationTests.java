@@ -100,12 +100,16 @@ public class DemogatewayApplicationTests {
 					.exchange()
 					.returnResult(Map.class);
 			if (result.getStatus().equals(HttpStatus.TOO_MANY_REQUESTS)) {
+				System.out.println("Received result: "+result);
 				wasLimited = true;
 				break;
 			}
 		}
 
-		assertThat(wasLimited).isTrue().as("A HTTP 429 TOO_MANY_REQUESTS was not received");
+		assertThat(wasLimited)
+				.as("A HTTP 429 TOO_MANY_REQUESTS was not received")
+				.isTrue();
+
 	}
 
 }
