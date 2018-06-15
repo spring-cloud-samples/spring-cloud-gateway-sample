@@ -14,8 +14,6 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.net.URI;
-
 @RestController
 @SpringBootApplication
 public class DemogatewayApplication {
@@ -61,6 +59,7 @@ public class DemogatewayApplication {
 	@Bean
 	SecurityWebFilterChain springWebFilterChain(ServerHttpSecurity http) throws Exception {
 		return http.httpBasic().and()
+				.csrf().disable()
 				.authorizeExchange()
 				.pathMatchers("/anything/**").authenticated()
 				.anyExchange().permitAll()
