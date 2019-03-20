@@ -36,7 +36,7 @@ X-XSS-Protection: 1 ; mode=block
         "User-Agent": "HTTPie/0.9.8"
     }, 
     "origin": "207.107.158.66", 
-    "url": "http://httpbin.org/get"
+    "url": "https://httpbin.org/get"
 }
 
 
@@ -98,7 +98,7 @@ X-XSS-Protection: 1 ; mode=block
         "User-Agent": "HTTPie/0.9.8"
     }, 
     "origin": "207.107.158.66", 
-    "url": "http://httpbin.org/get"
+    "url": "https://httpbin.org/get"
 }
 
 $ http :8080/delay/2 Host:www.hystrix.org
