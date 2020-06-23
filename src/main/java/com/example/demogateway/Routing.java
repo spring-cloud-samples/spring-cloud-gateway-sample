@@ -13,7 +13,7 @@ public class Routing {
     public RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
         //@formatter:off
         return builder.routes()
-//                .route(p -> p.path("/hello").filters(f -> f.addRequestHeader("hello", "world")).uri("http://localhost:8080"))
+                .route(p -> p.path("/hello").filters(f -> f.addRequestHeader("Hello", "World")).uri("http://httpbin.org:80"))
                 .route("path_route", r -> r.path("/get").uri("http://httpbin.org"))
                 .route("host_route", r -> r.host("*.myhost.org").uri("http://httpbin.org"))
                 .route("rewrite_route", r -> r.host("*.rewrite.org").filters(f -> f.rewritePath("/foo/(?<segment>.*)","/${segment}")).uri("http://httpbin.org"))
