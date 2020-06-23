@@ -42,6 +42,18 @@ public class DemogatewayApplicationTests {
 
 	@Test
 	@SuppressWarnings("unchecked")
+	public void helloPathRouteWorks() {
+		client.get().uri("/hello")
+				.exchange()
+				.expectStatus().isOk()
+				.expectBody(Map.class)
+				.consumeWith(result -> {
+					assertThat(result.getResponseBody()).isNotEmpty();
+				});
+	}
+
+	@Test
+	@SuppressWarnings("unchecked")
 	public void hostRouteWorks() {
 		client.get().uri("/headers")
 				.header("Host", "www.myhost.org")
