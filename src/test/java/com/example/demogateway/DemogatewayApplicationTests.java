@@ -23,15 +23,31 @@ public class DemogatewayApplicationTests {
 	int port;
 	private WebTestClient client;
 
+	int staticPort = 8080;
+	private WebTestClient staticClient;
+
 	@Before
 	public void setup() {
 		client = WebTestClient.bindToServer().baseUrl("http://localhost:" + port).build();
+		staticClient = WebTestClient.bindToServer().baseUrl("http://localhost:" + staticPort).build();
 	}
 
 	@Test
 	@SuppressWarnings("unchecked")
 	public void pathRouteWorks() {
 		client.get().uri("/get")
+				.exchange()
+				.expectStatus().isOk()
+				.expectBody(Map.class)
+				.consumeWith(result -> {
+					assertThat(result.getResponseBody()).isNotEmpty();
+				});
+	}
+
+	@Test
+	@SuppressWarnings("unchecked")
+	public void helloPathRouteWorks() {
+		staticClient.get().uri("/hello")
 				.exchange()
 				.expectStatus().isOk()
 				.expectBody(Map.class)
