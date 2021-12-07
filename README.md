@@ -101,7 +101,7 @@ X-XSS-Protection: 1 ; mode=block
     "url": "http://httpbin.org/get"
 }
 
-$ http :8080/delay/2 Host:www.hystrix.org
+$ http :8080/delay/2 Host:www.circuitbreaker.org
 HTTP/1.1 504 Gateway Timeout
 Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Expires: 0

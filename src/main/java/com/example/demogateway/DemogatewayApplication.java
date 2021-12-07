@@ -18,8 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 @SpringBootApplication
 public class DemogatewayApplication {
 
-	@RequestMapping("/hystrixfallback")
-	public String hystrixfallback() {
+	@RequestMapping("/circuitbreakerfallback")
+	public String circuitbreakerfallback() {
 		return "This is a fallback";
 	}
 
@@ -35,11 +35,11 @@ public class DemogatewayApplication {
 						.filters(f -> f.rewritePath("/foo/(?<segment>.*)",
 								"/${segment}"))
 						.uri("http://httpbin.org"))
-				.route("hystrix_route", r -> r.host("*.hystrix.org")
-						.filters(f -> f.hystrix(c -> c.setName("slowcmd")))
+				.route("circuitbreaker_route", r -> r.host("*.circuitbreaker.org")
+						.filters(f -> f.circuitBreaker(c -> c.setName("slowcmd")))
 								.uri("http://httpbin.org"))
-				.route("hystrix_fallback_route", r -> r.host("*.hystrixfallback.org")
-						.filters(f -> f.hystrix(c -> c.setName("slowcmd").setFallbackUri("forward:/hystrixfallback")))
+				.route("circuitbreaker_fallback_route", r -> r.host("*.circuitbreakerfallback.org")
+						.filters(f -> f.circuitBreaker(c -> c.setName("slowcmd").setFallbackUri("forward:/circuitbreakerfallback")))
 								.uri("http://httpbin.org"))
 				.route("limit_route", r -> r
 					.host("*.limited.org").and().path("/anything/**")

@@ -1,21 +1,19 @@
 package com.example.demogateway;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.reactive.server.FluxExchangeResult;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.util.Map;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.web.reactive.function.client.ExchangeFilterFunctions.basicAuthentication;
 
-@RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class DemogatewayApplicationTests {
 
@@ -23,7 +21,7 @@ public class DemogatewayApplicationTests {
 	int port;
 	private WebTestClient client;
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		client = WebTestClient.bindToServer().baseUrl("http://localhost:" + port).build();
 	}
@@ -68,18 +66,18 @@ public class DemogatewayApplicationTests {
 
 	@Test
 	@SuppressWarnings("unchecked")
-	public void hystrixRouteWorks() {
+	public void circuitBreakerRouteWorks() {
 		client.get().uri("/delay/3")
-				.header("Host", "www.hystrix.org")
+				.header("Host", "www.circuitbreaker.org")
 				.exchange()
 				.expectStatus().isEqualTo(HttpStatus.GATEWAY_TIMEOUT);
 	}
 
 	@Test
 	@SuppressWarnings("unchecked")
-	public void hystrixFallbackRouteWorks() {
+	public void circuitBreakerFallbackRouteWorks() {
 		client.get().uri("/delay/3")
-				.header("Host", "www.hystrixfallback.org")
+				.header("Host", "www.circuitbreakerfallback.org")
 				.exchange()
 				.expectStatus().isOk()
 				.expectBody(String.class).isEqualTo("This is a fallback");
